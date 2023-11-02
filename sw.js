@@ -14,8 +14,6 @@ var VERSION = 'version_01';
 var URLS = [    
   `${GHPATH}/`,
   `${GHPATH}/index.html`,
- // `${GHPATH}/css/styles.css`,
- // `${GHPATH}/js/app.js`
-  `${GHPATH}/caDupli-master/files/JSON/consult.html`
-  `${GHPATH}/caDupli-master/files/JSON/html5-qrcode.min.js`
+ // `${GHPATH}/caDupli-master/files/JSON/consult.html`
+  //`${GHPATH}/caDupli-master/files/JSON/html5-qrcode.min.js`
 ]
