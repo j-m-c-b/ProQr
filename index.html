@@ -11,12 +11,11 @@
   <h1>GitHub page as PWA template</h1>
     …
   <script>
+   
+
       if (navigator.serviceWorker) {
-        navigator.serviceWorker.register (
-          '/ProQr/sw.js',
-          {scope: '/ProQr/'}
-        )
-      }
+            navigator.serviceWorker.register( '/ProQr/sw.js', { scope: /ProQr/ })
+        }
   </script>
 </body>
 </html>
