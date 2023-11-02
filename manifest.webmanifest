@@ -1,0 +1,26 @@
+{
+
+    "name": "Github pQR",
+    "short_name": "pQR",
+
+    "description": "Github Page as a Progressive Web App",
+   
+
+    "scope": "/ProQr/",
+    "start_url": "/ProQr/",
+   
+
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+   
+
+    "display": "standalone", 
+ 
+    "icons": [
+        {
+          "src": "/ProQr/icon.png",
+          "type": "image/vnd.microsoft.icon",
+          "sizes": "700x700"
+        }
+    ]
+  }
