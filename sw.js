@@ -12,9 +12,7 @@ var APP_PREFIX = 'proQ';
 // others to this list
 
 
-var GHPATH = '/github-page-pwa';
-var APP_PREFIX = 'gppwa_';
-var VERSION = 'version_002';
+var VERSION = 'version_003';
 var URLS = [    
   `${GHPATH}/`,
   `${GHPATH}/index.html`,
