@@ -9,7 +9,7 @@
     <script src="flexsearch.compact.js"></script>
     <script defer src="JsBarcode.all.min.js"></script>
     <!-- <script src="../a.js"></script> -->
-    <script src="../../ca-master/a.js"></script>
+    <!-- <script src="../../ca-master/a.js"></script> -->
     <style>
         body {
             background-color: #1a1a1a;
@@ -146,6 +146,10 @@
 
 
     <script>
+        if (localStorage.getItem('arr')) {
+            arr = JSON.parse(localStorage.getItem('arr'));
+        }
+
         let currentTr = 0;
 
 
@@ -173,7 +177,10 @@
         });
 
         function showSuggestions() {
-            let arrIndex = index.search(inTerm.value, 22);
+            let arrIndex = index.search(inTerm.value, 26);
+            
+            arrIndex.sort((a, b) => arr[a].price - arr[b].price);
+
             tableProducts.innerHTML =
                 `   <table id="tableProducts">
             <tr>
@@ -254,7 +261,7 @@
             return new Intl.NumberFormat('en-US').format(num);
         }
 
-            // console.log(index.search("azucar", 14));
+        // console.log(index.search("azucar", 14));
 
     </script>
 

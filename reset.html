@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <button onclick="reset()">Reset</button>
+
+
+
+    <script>
+        function reset() {
+            if ('serviceWorker' in navigator) { navigator.serviceWorker.getRegistrations().then(function (registrations) { for (let registration of registrations) { registration.unregister(); } }).then(function () { window.location.reload(true); }); }
+        }
+    </script>
+</body>
+
+</html>
