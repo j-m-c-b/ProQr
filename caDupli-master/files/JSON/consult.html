@@ -138,6 +138,7 @@
 </head>
 
 <body>
+    <input type="file" id="fileInput" accept=".txt,.js" oninput="">
 
     <div id="qr-reader" style="width:500px"></div>
     <div id="qr-reader-results"></div>
@@ -199,6 +200,64 @@
 
     <script src="../../../../ca-master/a.js"></script>
 
+
+    <script>
+
+        const fileInput = document.getElementById('fileInput');
+        fileInput.addEventListener('change', handleFileUpload);
+
+        // Step 2: Function to handle file upload and extract the 'arr' variable
+        function handleFileUpload() {
+            // Check if a file was selected
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function (event) {
+                    const fileContent = event.target.result;
+                    let uploadedArray;
+
+                    // Use a regular expression to extract 'let arr =' followed by valid JSON
+                    const match = fileContent.replace("let arr =", "");
+
+
+                    try {
+                       
+                        uploadedArray = JSON.parse(match);
+                        // Replace the existing 'arr' with the uploaded array
+                        window.arr = uploadedArray;
+
+                        // Save the uploaded array to local storage
+                        localStorage.setItem('arr', JSON.stringify(uploadedArray));
+
+                        // You can perform additional actions or update the UI as needed
+                        alert('File uploaded and array replaced.');
+                    } catch (error) {
+                        alert('Error parsing the uploaded file content: ' + error);
+                    }
+
+                };
+
+                reader.readAsText(file);
+            }
+        }
+
+        // Step 3: Load 'arr' from local storage when the app starts
+        window.onload = function () {
+            // Check if 'arr' is available in local storage
+            const storedArray = localStorage.getItem('arr');
+            if (storedArray) {
+                try {
+                    // Parse the stored JSON and assign it to 'arr'
+                    window.arr = JSON.parse(storedArray);
+                } catch (error) {
+                    alert('Error parsing stored array: ' + error);
+                }
+            }
+
+            // You can perform additional initialization or UI updates here
+        }
+    </script>
 
 
     <script>
@@ -938,7 +997,7 @@
             domTxtSearchP.focus();
         }
 
-        
+
         function downloadListaRWithCurrentDate() {
             const currentDate = new Date();
             const year = currentDate.getFullYear();
