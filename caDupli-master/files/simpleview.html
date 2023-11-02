@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vista Simple</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-size: 2em;
+        }
+
+        #info {
+            text-align: center;
+        }
+
+        #price {
+            border-color: green;
+            border-width: 3px;
+            border-style: dotted;
+            font-size: 1.2em;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <script src="../a.js"></script>
+
+
+    <div id="info"></div>
+
+    <script>
+        let audioAdd = new Audio("JSON/sounds/add.mp3")
+
+
+
+        let playAudio = false;
+        let urlParams = new URLSearchParams(window.location.search);
+
+        if (urlParams.get('audio') === "true") {
+            playAudio = true
+
+        }
+        audioAdd.volume = 0.25;
+
+
+
+        let info = document.getElementById("info");
+        let text = "";
+        document.documentElement.addEventListener("keydown", function (e) {
+
+
+            if (e.key === "Enter") {
+                console.log(text)
+                let itemWasFound = false;
+
+
+                for (let product of arr) {
+                    if (text !== "" && text === product["barcode"]) {
+
+
+                        info.innerHTML =
+                            ` Barcode: ${product.barcode}
+                        <br><br> Nombre: ${product.name} 
+                        <br><br> Precio: <span id="price">${formartNum(product.price)}</span>`
+
+
+                        if (playAudio) {
+                            audioAdd.currentTime = 0;
+                            audioAdd.play();
+                        }
+
+
+
+
+                        itemWasFound = true;
+                        break;
+                    }
+                }
+                if (!itemWasFound) {
+                    info.innerHTML = "";
+                    alert("Producto NO ENCONTRADO")
+                }
+
+
+                text = "";
+
+                return;
+            }
+
+
+            text += e.key;
+
+
+        });
+
+        function formartNum(num) {
+            return new Intl.NumberFormat('en-US').format(num);
+        }
+    </script>
+
+</body>
+
+</html>

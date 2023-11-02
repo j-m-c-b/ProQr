@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>showPDF</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+        }
+
+        #pdfview {
+            width: 100%;
+            height: 300px;
+        }
+
+        a,
+        a:visited {
+            color: rgb(86, 190, 156);
+            font-size: 1.5em;
+        }
+    </style>
+
+</head>
+
+<body>
+    <script src="jspdf.umd.min.js"></script>
+    
+    <script src="../../makeFactura/RobotoMono-VariableFont_wght-normal.js"></script>
+    <div id="pdfContainer"></div>
+
+    <script>
+
+        var url_string = window.location.href;
+        var url = new URL(url_string);
+        var products = url.searchParams.get("products");
+
+
+        let info = JSON.parse(decodeURIComponent(products));
+        //console.log(info);
+
+
+        function loadpdf() {
+
+
+
+            //let info = { titulo, textoArr, type, tamaTitulo, tamaParrafo }
+
+            const date = new Date();
+            const fecha = `${date.getDate().toString().padStart(2, "0")}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getFullYear()}`;
+            const hora = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;
+
+
+
+
+
+
+
+            let titulo = "Recibo"
+            let tamaParrafo = "Parrafo";
+            let fontSize = 8;
+            let ySum = 5;
+            let xoffset = 4;
+
+            let moveCan = 3;
+
+            // generarPDF(xoffset fontSize moveCan ySum)
+            if (info.xoffset !== null && !isNaN(info.xoffset)) {
+                xoffset += parseFloat(info.xoffset);
+            }
+            if (info.fontSize !== null && !isNaN(info.fontSize)) {
+                fontSize += parseFloat(info.fontSize);
+            }
+            if (info.moveCan !== null && !isNaN(info.moveCan)) {
+                moveCan += parseFloat(info.moveCan);
+            }
+            if (info.ySum !== null && !isNaN(info.ySum)) {
+                ySum += parseFloat(info.ySum);
+                console.log(info.ySum);
+            }
+
+            let type = "parrafo";
+
+            let y = 17;
+
+            let height = info.productsList.length * ySum + 25;
+            const filename = fecha;
+
+
+
+            // let height = info.textoArr.length * ySum + 25;
+            if (height < 75) {
+                height = 75;
+            }
+
+
+            var doc = new jspdf.jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: [80, height + 10]
+            });
+
+            doc.autoPrint({ variant: 'non-conform' });
+
+            doc.setFont("RobotoMono-VariableFont_wght")
+
+            doc.setFontSize(8);
+            doc.text(`Fecha: ${fecha} Hora: ${hora}`, xoffset, 3);
+
+            doc.setFontSize(17);
+
+
+            doc.setFontSize(fontSize * 1.5);
+            doc.text("Recibo", xoffset, 8);
+            doc.setFontSize(fontSize);
+
+            doc.text("Nombre del Producto".slice(0, 25).padEnd(25, " "), xoffset, 12)
+            // doc.text("Can".padStart(fontSize + 12, " ").toString().padStart(3, "0") + "Precio".padStart(fontSize + 4, " ").padEnd(11, " "), xoffset + 30 + fontSize * 2, 12)
+
+
+            counter = 0;
+            for (let product of info.productsList) {
+                if (product.name === "") {
+                    product.name = "PRODUCTOS VARIOS";
+                }
+                if (counter === 0) {
+                    doc.text("Can".padStart(3, "0") + "Precio".padStart(11, "_"), xoffset + 30 + fontSize + moveCan, 12)
+                }
+                doc.text(product.name.toLowerCase().slice(0, 24).padEnd(24, "."), xoffset, y)
+                let totalOneP = (formartNum(product.price * product.quantity)).toString();
+                let totalPad = 11;
+                if (totalOneP.length < 4) {
+                    totalOneP = " " + totalOneP;
+                }
+                if (totalOneP.length > 8) {
+                    totalPad += 1
+                    totalOneP = " " + totalOneP
+                }
+                doc.text(product.quantity.toString().padStart(3, "0") + totalOneP.padStart(totalPad, "_"), xoffset + 30 + fontSize + moveCan, y)
+                y += ySum;
+
+                counter += 1;
+            }
+
+
+
+
+            // for (let product of info.textoArr) {
+            //     doc.text(product, xoffset, y);
+            //     y += ySum;
+            // }
+
+            // doc.text("-------", xoffset, y + 5);
+
+            doc.setFontSize(fontSize * 2);
+            doc.text(`Total: ${info.totalPrice}`, xoffset + 13, y + 4);
+
+
+            doc.text(`---------------------------------------------`, 0, y + 13);
+            doc.setFontSize(fontSize);
+            let outputFile = doc.output("dataurlstring");
+            let pdfContainer = document.getElementById("pdfContainer");
+            pdfContainer.innerHTML = `
+        <embed id="pdfview" src="${outputFile}" type="application/pdf">
+        `;
+
+            let div = document.createElement("div")
+            div.innerHTML = `<br><br><a href="${outputFile}" download="${(fecha + "_" + hora).replace(":", "-").replace(":", "-")}.pdf">Download ${(fecha + "_" + hora).replace(":", "-").replace(":", "-")}.pdf</a>`
+            document.body.appendChild(div);
+        }
+
+
+
+
+        Array.prototype.scaleBetween = function (scaledMin, scaledMax) {
+            var max = Math.max.apply(Math, this);
+            var min = Math.min.apply(Math, this);
+            return this.map(num => (scaledMax - scaledMin) * (num - min) / (max - min) + scaledMin);
+        }
+
+        function formartNum(num) {
+            return new Intl.NumberFormat('en-US').format(num);
+        }
+
+        loadpdf();
+
+    </script>
+
+</body>
+
+</html>

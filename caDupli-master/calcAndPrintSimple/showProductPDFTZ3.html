@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>showPDF</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+        }
+
+        #pdfview {
+            width: 100%;
+            height: 300px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <script src="../a.js"></script>
+    <script src="JsBarcode.all.min.js"></script>
+    <script src="jspdf.umd.min.js"></script>
+    <script src="../../makeFactura/RobotoMono-VariableFont_wght-normal.js"></script>
+
+    <div id="pdfContainer"></div>
+    <canvas id="barcode"></canvas>
+    <script>
+
+
+        var url_string = window.location.href;
+        var url = new URL(url_string);
+        // var datos = url.searchParams.get("datos");
+        // let info = JSON.parse(decodeURIComponent(datos));
+
+        var barcodeNum = prompt("CODIGO");
+    
+        var parrafo1;
+     
+        // var justSee = info.justSee;
+        var justSee = false;
+        itemWasFound = false;
+
+        if (barcodeNum) {
+            
+            for (let product of arr) {
+                if (barcodeNum !== "" && barcodeNum === product["barcode"]) {
+
+
+                    parrafo1 = prompt("NOMBRE",  product["name"]).toUpperCase();
+                
+
+
+
+
+
+
+                    itemWasFound = true;
+                    break;
+                }
+            }
+            if(itemWasFound === false){
+                parrafo1 = prompt("NOMBRE").toUpperCase();
+            }
+        
+        }else{
+           
+        }
+
+        var titulo1 = prompt("PRECIO").toUpperCase().split(",").join("");
+        
+
+
+        JsBarcode("#barcode", barcodeNum.trim(), {
+            format: "CODE128",
+            width: 1,
+            height: 20,
+            margin: 1,
+            displayValue: true,
+            fontSize: 14,
+            textMargin: 0,
+        });
+        var parrafoArray = parrafo1.split(" ");
+        var textoArr = [];
+
+
+        if (parrafoArray.length > 2) {
+            textoArr[0] = parrafoArray[0] + " " + parrafoArray[1];
+            textoArr[1] = parrafoArray[2] + " " + (parrafoArray[3] || "") + " " + (parrafoArray[4] || "")  + " " + (parrafoArray[5] || "");
+            textoArr[2] = (parrafoArray[6] || "");
+        } else {
+            textoArr[0] = parrafo1;
+        }
+
+        function loadpdf(justSee) {
+
+
+
+          
+            let info = { titulo: titulo1, parrafo: parrafo1, textoArr: textoArr, tamaTitulo: 15, tamaParrafo: 16 }
+            const date = new Date();
+            const fecha = `${date.getDate().toString().padStart(2, "0")}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getFullYear()}`;
+            const hora = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;
+
+
+
+
+
+
+
+            let tamaTitulo = info.titulo;
+            let tamaParrafo = info.tamaParrafo;
+           
+            let type = "parrafo";
+            //   let info = { titulo, textoArr, type, tamaTitulo, tamaParrafo }
+
+            // console.log(info.xoffset);
+            if (!info.xoffset) {
+                info.xoffset = 0;
+            }
+
+            let xoffset = 4 + info.xoffset;
+            let ySum = 6;
+            let y = 22;
+
+            let height = info.textoArr.length * ySum + 25;
+            if (height < 75) {
+                height = 75;
+            }
+
+
+
+            var doc = new jspdf.jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: [80, height + 5]
+            });
+            if (justSee === false) {
+                doc.autoPrint({ variant: 'non-conform' });
+            }
+            // if(info.monoFont){
+            //     doc.setFont("RobotoMono-VariableFont_wght")
+            // }
+            img = document.querySelector("#barcode");
+            //  doc.addImage(img.src, 'JPEG', 23, 1, img.width, img.height);
+            var jpegUrl = document.querySelector("#barcode").toDataURL("image/jpeg");
+            doc.addImage(jpegUrl, 'JPEG', 34, 0);
+
+            //does: size of printed price 
+            let sizeOfT = 6;
+            doc.setFontSize(8);
+            //   doc.text(`Fecha: ${fecha} Hora: ${hora}`, + xoffset, 3);
+            info.titulo = round50(parseFloat( info.titulo));
+            doc.setFontSize(info.tamaTitulo + sizeOfT);
+            doc.text("$" + formartNum(info.titulo), xoffset-1.5, 6);
+            doc.setFontSize(info.tamaParrafo);
+
+            for (let product of info.textoArr) {
+                doc.text(product, xoffset + 1, y - 9);
+                y += ySum;
+            }
+
+            //size
+            // doc.text("-------", xoffset, y + 37);
+
+
+
+            let pdfContainer = document.getElementById("pdfContainer");
+            pdfContainer.innerHTML = `
+        <embed id="pdfview" src="${doc.output("dataurlstring")}" type="application/pdf">
+        `;
+
+
+        }
+
+
+
+
+        Array.prototype.scaleBetween = function (scaledMin, scaledMax) {
+            var max = Math.max.apply(Math, this);
+            var min = Math.min.apply(Math, this);
+            return this.map(num => (scaledMax - scaledMin) * (num - min) / (max - min) + scaledMin);
+        }
+        function formartNum(num) {
+            return new Intl.NumberFormat('en-US').format(num);
+        }
+        function round50(num){
+            return Math.round(num/50) * 50;
+        }
+        loadpdf(justSee);
+    </script>
+
+</body>
+
+</html>

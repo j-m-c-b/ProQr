@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cambiar Producto</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+        }
+
+        input,
+        textarea {
+
+            color: white;
+            background-color: rgb(71, 94, 129);
+        }
+
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: grey;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        .price {
+            text-align: right;
+        }
+
+        .closeButtom {
+            background-color: rgb(179, 41, 41);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .quantityButtom {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        thead {
+            display: block;
+        }
+
+        table {
+            display: block;
+            overflow-y: scroll;
+            max-height: 400px;
+        }
+
+        thead th,
+        tbody td {
+            width: 70px;
+        }
+
+        #ultimate {
+            text-align: right;
+        }
+
+        button {
+            font-size: 1em;
+        }
+
+        #domTxtSearchP:focus {
+            border-color: green;
+            border-width: 4px;
+            border-style: solid;
+        }
+
+        #domTxtSearchP {
+            border-color: red;
+            border-width: 4px;
+            border-style: solid;
+        }
+
+        table {
+            font-size: 0.86em;
+        }
+
+        #ultimate,
+        #lastProduct {
+            font-size: 0.79em;
+        }
+
+        #domTxtSearchP,
+        input {
+            height: 2em;
+        }
+
+
+
+        #domTotalPrice {
+            border-color: green;
+            border-width: 2px;
+            border-style: dotted;
+            font-size: 1.2em;
+        }
+
+        #domTxtResult {
+            width: 70%;
+        }
+    </style>
+</head>
+
+<body>
+    Barcode de producto: <input id="domTxtSearchP" type="text">
+
+    <div id="con"></div>
+    <br>
+    Nuevo Precio: <input id="domTxtInPrice" type="text" name="" id=""> <span id="lbNewPrice"></span>
+
+    <br><br>
+    Resultado <input id="domTxtResult" type="text"> <button id="button">Copiar</button>
+
+    <script src="../../../a.js"></script>
+
+    <script>
+        let domTxtSearchP = document.getElementById("domTxtSearchP");
+        let domTxtInPrice = document.getElementById("domTxtInPrice");
+        let domTxtResult = document.getElementById("domTxtResult");
+        let button = document.getElementById("button");
+
+
+        domTxtSearchP.value = "";
+        domTxtInPrice.value = "";
+        domTxtResult.value = "";
+
+        domTxtSearchP.focus();
+        let productsList = [
+            // index
+            // name,
+            // quantity ,
+            // price,
+
+
+        ]
+        let theProduct = {};
+
+
+        domTxtInPrice.addEventListener("input", function () {
+           document.getElementById("lbNewPrice").textContent = formartNum(parseInt(domTxtInPrice.value));
+        })
+        domTxtSearchP.addEventListener("keyup", function (event) {
+
+            if (event.key === "Enter") {
+
+                enter();
+
+            }
+
+        });
+        domTxtInPrice.addEventListener("keyup", function (event) {
+
+            if (event.key === "Enter") {
+
+                domTxtResult.value = `{"barcode":"${theProduct["barcode"]}","name":"${theProduct["name"]}","price":"${domTxtInPrice.value}"},`
+                button.click();
+            }
+
+        });
+
+        function enter() {
+            let text = domTxtSearchP.value.toLowerCase();
+            let itemWasFound = false;
+
+            if (text === "") {
+                return;
+            }
+
+
+
+            for (let product of arr) {
+                if (text !== "" && text === product["barcode"]) {
+                    theProduct = product;
+
+
+                    document.getElementById("con").innerHTML =
+                        `
+                    Barcode: <b> ${product["barcode"]} </b><br>
+                    Nombre:<b> ${product["name"]}</b> <br>
+                    Precio: <b> ${formartNum(parseInt(product["price"]))}</b> <br>
+
+                    `
+                    // createProductItem(
+                    //     product["barcode"],
+                    //     product["name"],
+                    //     parseInt(product["price"])
+
+                    // )
+
+                    // showProducts();
+
+
+
+                    itemWasFound = true;
+                    break;
+                }
+            }
+            if (!itemWasFound) {
+                alert("not found")
+
+            } else {
+                domTxtInPrice.focus();
+            }
+        }
+
+  
+        button.addEventListener("click", (e) => {
+
+            domTxtResult.select();
+            document.execCommand("Copy");
+
+        });
+        function formartNum(num) {
+            return new Intl.NumberFormat('en-US').format(num);
+        }
+    </script>
+</body>
+
+</html>

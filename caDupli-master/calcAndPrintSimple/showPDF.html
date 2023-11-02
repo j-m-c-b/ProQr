@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>showPDF</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+        }
+
+        #pdfview {
+            width: 100%;
+            height: 300px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <script src="jspdf.umd.min.js"></script>
+    <script src="../../makeFactura/RobotoMono-VariableFont_wght-normal.js"></script>
+    <div id="pdfContainer"></div>
+
+    <script>
+
+        var url_string = window.location.href;
+        var url = new URL(url_string);
+        var datos = url.searchParams.get("datos");
+        let info = JSON.parse(decodeURIComponent(datos));
+        var justSee = info.justSee;
+
+        function loadpdf(justSee) {
+
+
+
+            //let info = { titulo, textoArr, type, tamaTitulo, tamaParrafo }
+
+            const date = new Date();
+            const fecha = `${date.getDate().toString().padStart(2, "0")}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getFullYear()}`;
+            const hora = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;
+
+
+
+
+
+
+
+            let tamaTitulo = info.titulo;
+            let tamaParrafo = info.tamaParrafo;
+
+            let type = "parrafo";
+            //   let info = { titulo, textoArr, type, tamaTitulo, tamaParrafo }
+
+            // console.log(info.xoffset);
+            if (!info.xoffset) {
+                info.xoffset = 0;
+            }
+
+            let xoffset = 4 + info.xoffset;
+            let ySum = 7;
+            let y = 22;
+
+            let height = info.textoArr.length * ySum + 25;
+            if (height < 95) {
+                height = 95;
+            }
+
+
+
+            var doc = new jspdf.jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: [80, height + 5]
+            });
+            if (justSee === false) {
+                doc.autoPrint({ variant: 'non-conform' });
+            }
+            if(info.monoFont){
+                doc.setFont("RobotoMono-VariableFont_wght")
+            }
+         
+
+            doc.setFontSize(8);
+            doc.text(`Fecha: ${fecha} Hora: ${hora}`, + xoffset, 3);
+
+            doc.setFontSize(info.tamaTitulo);
+            doc.text(info.titulo, xoffset, 13);
+            doc.setFontSize(info.tamaParrafo);
+
+            for (let product of info.textoArr) {
+                doc.text(product, xoffset, y);
+                y += ySum;
+            }
+
+            //size
+            doc.text("-------", xoffset, y + 70);
+
+
+
+            let pdfContainer = document.getElementById("pdfContainer");
+            pdfContainer.innerHTML = `
+        <embed id="pdfview" src="${doc.output("dataurlstring")}" type="application/pdf">
+        `;
+
+
+        }
+
+
+
+
+        Array.prototype.scaleBetween = function (scaledMin, scaledMax) {
+            var max = Math.max.apply(Math, this);
+            var min = Math.min.apply(Math, this);
+            return this.map(num => (scaledMax - scaledMin) * (num - min) / (max - min) + scaledMin);
+        }
+
+
+        loadpdf(justSee);
+    </script>
+
+</body>
+
+</html>

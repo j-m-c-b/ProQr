@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print3</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: monospace;
+        }
+
+        #pdfview {
+            width: 100%;
+            height: 300px;
+        }
+
+        textarea {
+            background-color: grey;
+        }
+
+
+
+        input,
+        textarea {
+            color: white;
+            background-color: rgb(71, 94, 129);
+        }
+    </style>
+</head>
+
+<body>
+    <script src="jspdf.umd.min.js"></script>
+    <textarea name="" id="parrafo" cols="30" rows="14"></textarea>
+    <br> Tamaño Titulo: <input type="text" name="" id="tamaTitulo" value="14">
+    <br> Tamaño Parrafo: <input type="text" name="" id="tamaParrafo" value="14">
+
+
+    <div id="pdfContainer"></div>
+
+
+    <script>
+        let parrafo = document.getElementById("parrafo");
+        parrafo.value = "";
+        
+        parrafo.focus();
+
+
+        document.body.addEventListener("keypress", function (e) {
+          
+
+            if (e.shiftKey) {
+                
+                if (e.key.toLowerCase() === "d") {
+                    loadpdf(false);
+                    e.preventDefault();
+                } else if (e.key.toLowerCase() === "s") {
+                    loadpdf(true);
+                    e.preventDefault();
+                }
+            }
+            return;
+        });
+    </script>
+
+
+
+    <script>
+
+
+
+
+
+
+
+
+
+
+        function loadpdf(justSee) {
+            const date = new Date();
+            const fecha = `${date.getDate().toString().padStart(2, "0")}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getFullYear()}`;
+            const hora = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;
+
+
+
+            let parag = parrafo.value;
+
+            let monoFont = true; 
+
+            parag = parag.split("\n");
+
+            let titulo = parag.slice(0, 1);
+            let textoArr = parag.slice(1, parag.length);
+
+
+
+            let tamaTitulo = document.getElementById("tamaTitulo").value
+            let tamaParrafo = document.getElementById("tamaParrafo").value
+
+            let type = "parrafo";
+            let info = { titulo, textoArr, type, tamaTitulo, tamaParrafo, justSee, monoFont}
+
+            window.open("showPDF.html?datos=" + encodeURIComponent(JSON.stringify(info)) ,"_blank")
+
+
+        }
+
+
+
+
+        Array.prototype.scaleBetween = function (scaledMin, scaledMax) {
+            var max = Math.max.apply(Math, this);
+            var min = Math.min.apply(Math, this);
+            return this.map(num => (scaledMax - scaledMin) * (num - min) / (max - min) + scaledMin);
+        }
+
+
+
+
+    </script>
+<!-- 
+    <div>
+        <h4>modifiers: min, max, x, y, rota</h4>
+
+        <h4>loadpdf()</h4>
+    </div> -->
+
+</body>
+
+
+</html>

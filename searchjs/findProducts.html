@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1, maximum-scale=1.0, user-scalable=no">
+    <title>Buscar Productos</title>
+    <script src="flexsearch.compact.js"></script>
+    <script defer src="JsBarcode.all.min.js"></script>
+    <!-- <script src="../a.js"></script> -->
+    <script src="../../ca-master/a.js"></script>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        input {
+            background-color: #303030;
+            color: #ffffff;
+            font-size: 1.2em;
+            border: 1px solid #505050;
+            padding: 8px;
+            border-radius: 5px;
+            width: 70%;
+        }
+
+        button {
+            background-color: #505050;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #containerTable {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #505050;
+            background-color: #1a1a1a;
+            border-radius: 5px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #505050;
+        }
+
+        th {
+            background-color: #333333;
+            color: #ffffff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #222222;
+        }
+
+        .copyButton,
+        .quantityButton {
+            background-color: #404040;
+            color: #ffffff;
+            padding: 6px 12px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .copyButtom:hover {
+            cursor: pointer;
+        }
+
+        .productSelected {
+            /* background-color: #0066cc; */
+            color: #a4c9ee;
+            ;
+            font-weight: bold;
+        }
+
+        .td3Selected {
+            color: #6c97c5;
+        }
+
+        .price {
+            text-align: right;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #66cc66;
+            border-width: 2px;
+            border-style: solid;
+        }
+
+        button:focus,
+        .copyButton:focus,
+        .quantityButton:focus {
+            outline: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #505050;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background-color: #1a1a1a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <input id="inTerm" type="text" name="" id="">
+
+    <button onclick="document.getElementById('inTerm').value = '';showSuggestions()">Borrar</button>
+    <div id="containerTable">
+        <table id="tableProducts">
+            <tr>
+                <th>[-]</th>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Barcode</th>
+
+            </tr>
+        </table>
+
+    </div>
+
+
+    <script>
+        let currentTr = 0;
+
+
+        var index = new FlexSearch({
+
+            encode: "balance",
+            tokenize: "reverse",
+            suggest: true,
+            cache: true,
+            autocomplete: false
+        });
+
+        for (var i = 0; i < arr.length; i++) {
+            index.add(i, `${arr[i].name}  ${arr[i].price} ${arr[i].barcode}`);
+        }
+
+        let inTerm = document.getElementById("inTerm");
+        let tableProducts = document.getElementById("tableProducts");
+
+        inTerm.value = "";
+        inTerm.addEventListener("input", function () {
+            currentTr = 0;
+            showSuggestions();
+
+        });
+
+        function showSuggestions() {
+            let arrIndex = index.search(inTerm.value, 22);
+            tableProducts.innerHTML =
+                `   <table id="tableProducts">
+            <tr>
+                <th>[-]</th>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>barcode</th>
+                
+            </tr>
+        </table>`;
+            for (let i of arrIndex) {
+
+
+                let tr = document.createElement("tr");
+                let td0 = document.createElement("td");
+                let td1 = document.createElement("td");
+                let td2 = document.createElement("td");
+                let td3 = document.createElement("td");
+
+                td0.innerText = "[-]";
+                td1.innerText = `${arr[i].name}`;
+                td2.innerText = `${formartNum(arr[i].price)}`;
+                td3.innerText = `${arr[i].barcode}`;
+
+                td0.classList.add("copyButtom");
+                td2.classList.add("price");
+
+                td0.classList.add("td0");
+                td1.classList.add("td1");
+                td2.classList.add("td2");
+                td3.classList.add("td3");
+
+
+
+                tr.appendChild(td0);
+                tr.appendChild(td1);
+                tr.appendChild(td2);
+                tr.appendChild(td3);
+
+                tableProducts.appendChild(tr);
+
+                td0.addEventListener("click", function () {
+                    let input = document.createElement("input");
+                    input.value = arr[i].barcode;
+                    document.body.appendChild(input);
+
+                    input.select();
+                    document.execCommand("Copy");
+                    input.remove();
+                    tr.classList.add("productSelected");
+
+
+                    let imgBarC = document.createElement("img");
+                    JsBarcode(imgBarC, arr[i].barcode, {
+                        width: 2.3
+                    });
+                    td1.appendChild(document.createElement("br"));
+                    td1.appendChild(imgBarC);
+                });
+                td3.addEventListener("click", function () {
+                    let input = document.createElement("input");
+                    input.value = "+" + arr[i].price + " " + arr[i].name;
+                    document.body.appendChild(input);
+
+                    input.select();
+                    document.execCommand("Copy");
+                    input.remove();
+                    td3.classList.add("td3Selected");
+                });
+
+            }
+        }
+
+
+        //console.log(arr);
+
+        function formartNum(num) {
+            return new Intl.NumberFormat('en-US').format(num);
+        }
+
+            // console.log(index.search("azucar", 14));
+
+    </script>
+
+
+
+    <script>
+        // let keymoveArr = ["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp"]; 
+        let keymoveArr = ["ArrowDown", "ArrowUp", "Enter", "+"];
+
+
+        let previus = document.createElement("tr");
+        if (true) {
+            document.addEventListener("keydown", function (event) {
+                // console.log(event);
+                if (keymoveArr.includes(event.key)) {
+
+                    event.preventDefault();
+
+
+
+
+
+
+                    if (event.key === "ArrowDown") {
+
+
+                        if (currentTr + 1 > document.getElementsByTagName("tr").length - 1) {
+                            return;
+                        }
+                        previus.style.backgroundColor = "";
+                        currentTr += 1;
+                        // previus.style.backgroundColor = "";
+                        document.getElementsByTagName("tr")[currentTr].style.backgroundColor = "darkolivegreen";
+                        document.getElementsByTagName("tr")[currentTr].scrollIntoView();
+
+                        previus = document.getElementsByTagName("tr")[currentTr];
+
+                    } else if (event.key === "ArrowUp") {
+
+                        if (currentTr - 2 < 0) {
+                            return;
+                        }
+                        previus.style.backgroundColor = "";
+                        currentTr -= 1;
+                        // previus.style.backgroundColor = "";
+                        document.getElementsByTagName("tr")[currentTr].style.backgroundColor = "darkolivegreen";
+                        document.getElementsByTagName("tr")[currentTr].scrollIntoView();
+
+                        previus = document.getElementsByTagName("tr")[currentTr];
+
+                    } else if (event.key === "Enter") {
+                        if (document.getElementsByTagName("tr")[currentTr]) {
+                            document.getElementsByTagName("tr")[currentTr].childNodes[0].click()
+                        }
+
+                    } else if (event.key === "+") {
+                        if (document.getElementsByTagName("tr")[currentTr]) {
+
+                            inTerm.focus();
+                            inTerm.scrollIntoView();
+                            // currentTr = 0;
+                        }
+
+                    }
+
+                }
+            });
+        }
+
+        inTerm.focus();
+
+    </script>
+</body>
+
+</html>

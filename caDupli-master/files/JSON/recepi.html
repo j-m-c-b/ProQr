@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recibo</title>
+    <style>
+        body,
+        html {
+            background-color: grey;
+            max-width: 82mm;
+            font-size: 0.8em;
+
+        }
+
+        th,
+        td {
+            border: 1px solid #272323;
+            text-align: left;
+            padding: 8px;
+        }
+
+        .price {
+            text-align: right;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        #centerTotal {
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        table {
+            font-size: 7pt;
+        }
+
+        #domAltura {
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+
+
+
+        <div id="containerTable">
+            <table id="tableProducts">
+                <tr>
+                    <th>Nombre</th>
+                    <th>C</th>
+                    <th>Precio</th>
+                </tr>
+            </table>
+
+        </div>
+        <div id="centerTotal">
+            <h3>Total: <span id="domTotal"></span></h3>
+        </div>
+    </section>
+
+    <div id="domAltura">
+        Altura: <span id="domHeight"></span>
+    </div>
+
+
+    <!-- <button onclick="download()">Descargar Imagen</button> -->
+
+    <script>
+        var url_string = window.location.href;
+        var url = new URL(url_string);
+        var info = url.searchParams.get("info");
+        var info = JSON.parse(decodeURIComponent(info))
+
+
+        for (let product of info.productsList) {
+            let tr = document.createElement("tr");
+
+
+
+
+            let td2 = document.createElement("td");
+            let td3 = document.createElement("td");
+            let td4 = document.createElement("td");
+
+
+            td2.textContent = product.name;
+            td3.textContent = product.quantity;
+            td4.textContent = formartNum(product.price * product.quantity);
+
+            td4.classList.add("price");
+            td3.classList.add("quantityButtom");
+
+
+            tr.appendChild(td2);
+            tr.appendChild(td3);
+            tr.appendChild(td4);
+
+            document.getElementById("tableProducts").appendChild(tr);
+
+
+
+
+            //totalPrice += (product.price * product.quantity);
+
+        }
+
+        document.getElementById("domTotal").innerText = info.totalPrice;
+
+        function formartNum(num) {
+            return new Intl.NumberFormat('en-US').format(num);
+        }
+
+    </script>
+    <script src="html2canvas.min.js"></script>
+    <script>
+
+        const date = new Date();
+        const filename = `Recibo ${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")} ${date.getHours().toString().padStart(2, "0")}_${date.getMinutes().toString().padStart(2, "0")}_${date.getSeconds().toString().padStart(2, "0")}.jpg`;
+        let div = document.createElement("div");
+        div.innerText = `Fecha: ${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")} Hora: ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;;
+        document.getElementsByTagName("section")[0].prepend(div);
+
+        html2canvas(document.getElementsByTagName("section")[0]).then(function (canvas) {
+            document.body.appendChild(canvas);
+
+
+
+            let link = document.getElementsByTagName('canvas')[0].toDataURL('image/jpeg');
+            let div = document.createElement("div");
+            div.innerHTML = ` <a href="${link}" download="${filename}"><img src="${link}"></a>`;
+            document.body.appendChild(div)
+
+            let tableHeight = Math.ceil(document.getElementById("tableProducts").getBoundingClientRect().height / 96);
+            document.getElementById("domHeight").innerHTML = `${tableHeight.toFixed(2)}''`;
+       
+       
+       
+        });
+
+        // function download() {
+        //     const date = new Date();
+        //     const filename = `Recibo ${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}.png`;
+        //     var link = document.createElement('a');
+        //     link.download = filename;
+        //     link.href = document.getElementsByTagName('canvas')[0].toDataURL();
+        //     link.click();
+
+        // }
+
+
+
+
+
+    </script>
+
+</body>
+
+</html>
