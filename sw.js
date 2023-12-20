@@ -19,7 +19,7 @@ var APP_PREFIX = 'proQ';
 
 
 var APP_PREFIX = 'pqr'     // Identifier for this app (this needs to be consistent across every cache update)
-var VERSION = 'version_08'              // Version of the off-line cache (change this value everytime you want to update cache)
+var VERSION = 'version_09'              // Version of the off-line cache (change this value everytime you want to update cache)
 var CACHE_NAME = APP_PREFIX + VERSION
 var URLS = [    
   'https://j-m-c-b.github.io/ProQr',                        // Add URL you want to cache in this list.
