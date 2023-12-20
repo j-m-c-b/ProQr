@@ -7,9 +7,7 @@
         content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1, maximum-scale=1.0, user-scalable=no">
     <title>Buscar Productos</title>
     <script src="flexsearch.compact.js"></script>
-    <script defer src="JsBarcode.all.min.js"></script>
-    <!-- <script src="../a.js"></script> -->
-    <!-- <script src="../../ca-master/a.js"></script> -->
+
     <style>
         body {
             background-color: #1a1a1a;
@@ -123,7 +121,21 @@
         ::-webkit-scrollbar-track {
             background-color: #1a1a1a;
         }
-    </style>
+     
+        .highlight {
+            /*
+             background-color: #ffcc00; 
+             */
+            /* Light orange, you can adjust the color */
+            color: #ffcc00;
+            /* Black text for better visibility */
+            font-weight: bold;
+
+            /* Add some padding for space around the highlighted text */
+
+            /* Optional: Add rounded corners for a softer look */
+        }    
+        </style>
 </head>
 
 <body>
@@ -177,24 +189,20 @@
         });
 
         function showSuggestions() {
-            let arrIndex = index.search(inTerm.value, 26);
-            
+            let arrIndex = index.search(inTerm.value, 32);
             arrIndex.sort((a, b) => arr[b].price - arr[a].price);
 
-
-            tableProducts.innerHTML =
-                `   <table id="tableProducts">
+            tableProducts.innerHTML = `
+        <table id="tableProducts">
             <tr>
                 <th>[-]</th>
                 <th>Producto</th>
                 <th>Precio</th>
-                <th>barcode</th>
-                
+                <th>Barcode</th>
             </tr>
         </table>`;
+        
             for (let i of arrIndex) {
-
-
                 let tr = document.createElement("tr");
                 let td0 = document.createElement("td");
                 let td1 = document.createElement("td");
@@ -202,9 +210,9 @@
                 let td3 = document.createElement("td");
 
                 td0.innerText = "[-]";
-                td1.innerText = `${arr[i].name}`;
-                td2.innerText = `${formartNum(arr[i].price)}`;
-                td3.innerText = `${arr[i].barcode}`;
+                td1.innerHTML = highlightText(arr[i].name);
+                td2.innerHTML = highlightText(formartNum(arr[i].price));
+                td3.innerHTML = highlightText(arr[i].barcode);
 
                 td0.classList.add("copyButtom");
                 td2.classList.add("price");
@@ -213,8 +221,6 @@
                 td1.classList.add("td1");
                 td2.classList.add("td2");
                 td3.classList.add("td3");
-
-
 
                 tr.appendChild(td0);
                 tr.appendChild(td1);
@@ -233,13 +239,6 @@
                     input.remove();
                     tr.classList.add("productSelected");
 
-
-                    let imgBarC = document.createElement("img");
-                    JsBarcode(imgBarC, arr[i].barcode, {
-                        width: 2.3
-                    });
-                    td1.appendChild(document.createElement("br"));
-                    td1.appendChild(imgBarC);
                 });
                 td3.addEventListener("click", function () {
                     let input = document.createElement("input");
@@ -251,9 +250,28 @@
                     input.remove();
                     td3.classList.add("td3Selected");
                 });
-
             }
         }
+        function highlightText(text) {
+            // Split the input text into an array of words
+            let words = inTerm.value.toLowerCase().split(/\s+/);
+
+            // Create a regular expression pattern for each word, excluding spaces
+            let patterns = words.map(word => `(${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`);
+
+            // Combine the patterns into a single regular expression
+            let regex = new RegExp(patterns.join("|"), "gi");
+
+            // Replace the matched words with the highlighted version
+            return text.replace(regex, match => (match.trim() !== '' ? `<span class="highlight">${match}</span>` : match));
+        }
+
+
+
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+        }
+
 
 
         //console.log(arr);
